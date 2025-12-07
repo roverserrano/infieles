@@ -25,7 +25,7 @@ function App() {
   const cargarListaGeneral = async () => {
     setCargando(true);
     try {
-      const response = await fetch('http://localhost:5000/api/lista-general');
+      const response = await fetch('https://infieles.onrender.com/api/lista-general');
       const data = await response.json();
       setLista(data);
     } catch (error) {
@@ -38,7 +38,7 @@ function App() {
   const buscarPorNombre = async (termino) => {
     setCargando(true);
     try {
-      const response = await fetch(`http://localhost:5000/api/buscar-infiel?nombre=${termino}`);
+      const response = await fetch(`https://infieles.onrender.com/api/buscar-infiel?nombre=${termino}`);
       const data = await response.json();
       setLista(data);
     } catch (error) {
