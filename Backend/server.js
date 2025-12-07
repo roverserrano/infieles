@@ -28,6 +28,7 @@ const IdeaSchema = new mongoose.Schema({
 
 const Infiel = mongoose.model('Infiel', IdeaSchema, 'infieles');
 
+/*
 app.get('/api/lista', async (req, res) => {
   try {
     const { q } = req.query; // Leemos el parámetro ?q=nombre
@@ -55,8 +56,9 @@ app.get('/api/lista', async (req, res) => {
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
+*/
 
-
+/*
 app.get('/api/lista-general', async (req, res) => {
   try {
     const data = await Infiel.find()
@@ -69,6 +71,7 @@ app.get('/api/lista-general', async (req, res) => {
     res.status(500).json({ error: "Error al obtener lista general" });
   }
 });
+*/
 
 
 app.get('/api/buscar-infiel', async (req, res) => {
