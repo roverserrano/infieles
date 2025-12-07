@@ -1,2 +1,2 @@
-# infieles
-Paguina web para buscar nombre de personas infieles
+# Infieles
+Paguina web para buscar nombre de personas infieles.
