@@ -1,4 +1,3 @@
-// server.js
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -7,17 +6,17 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Middlewares
-app.use(cors());
+// --- MIDDLEWARES ---
+app.use(cors()); // Permite peticiones desde cualquier origen (útil para desarrollo)
 app.use(express.json());
 
-// 1. Conexión a MongoDB Atlas
+// --- MONGODB ---
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('🟢 Conectado a MongoDB Atlas'))
   .catch(err => console.error('🔴 Error conectando a MongoDB:', err));
 
-// 2. Modelo (usa la colección "infieles")
-const IdeaSchema = new mongoose.Schema({
+// --- MODELO ---
+const InfielSchema = new mongoose.Schema({
   Hora_registro: Date,
   Nombre_infiel: String,
   Ciudad_origen: String,
@@ -26,76 +25,39 @@ const IdeaSchema = new mongoose.Schema({
   Explicacion_infidelidad: String
 });
 
-const Infiel = mongoose.model('Infiel', IdeaSchema, 'infieles');
+// Asegúrate de que el tercer parámetro 'infieles' coincide con tu colección en Atlas
+const Infiel = mongoose.model('Infiel', InfielSchema, 'infieles');
 
-/*
-app.get('/api/lista', async (req, res) => {
+// --- ENDPOINTS ---
+
+// Un solo endpoint inteligente para listar y buscar
+app.get('/api/infieles', async (req, res) => {
   try {
-    const { q } = req.query; // Leemos el parámetro ?q=nombre
+    const { busqueda } = req.query;
     let query = {};
 
-    // Si el usuario envió algo para buscar...
-    if (q) {
-      // PRO TIP: $regex con 'i' hace que no importen mayúsculas/minúsculas
-      // Esto equivale a: WHERE Nombre_infiel LIKE '%q%'
+    if (busqueda) {
+      // Búsqueda insensible a mayúsculas/minúsculas
       query = { 
-        Nombre_infiel: { $regex: q, $options: 'i' } 
+        Nombre_infiel: { $regex: busqueda, $options: 'i' } 
       };
+      console.log(`🔎 Buscando: "${busqueda}"`);
+    } else {
+      console.log("📂 Cargando lista general");
     }
 
-    console.log(`🔎 Buscando: ${q || 'Todo (últimos 10)'}`);
-
     const data = await Infiel.find(query)
-      .sort({ Hora_registro: -1 })
-      .limit(20); // Limitamos a 20 para no traer miles de registros en una búsqueda
+      .sort({ Hora_registro: -1 }) // Los más recientes primero
+      .limit(30); // Límite de seguridad
 
     res.json(data);
 
   } catch (error) {
-    console.error("❌ Error buscando datos:", error);
+    console.error("❌ Error en el servidor:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });
-*/
 
-/*
-app.get('/api/lista-general', async (req, res) => {
-  try {
-    const data = await Infiel.find()
-      .sort({ Hora_registro: -1 })
-      .limit(10);
-    
-    console.log("📂 Enviando lista general (últimos 10)");
-    res.json(data);
-  } catch (error) {
-    res.status(500).json({ error: "Error al obtener lista general" });
-  }
-});
-*/
-
-
-app.get('/api/buscar-infiel', async (req, res) => {
-  try {
-    const { nombre } = req.query; // Recibimos ?nombre=Denilson
-
-    if (!nombre) {
-      return res.status(400).json({ msg: "Falta el parámetro nombre" });
-    }
-
-    // Buscamos coincidencias (case insensitive)
-    const data = await Infiel.find({
-      Nombre_infiel: { $regex: nombre, $options: 'i' }
-    }).limit(20); // Limitamos a 20 para no saturar
-
-    console.log(`🔎 Buscando coincidencias para: "${nombre}"`);
-    res.json(data);
-
-  } catch (error) {
-    res.status(500).json({ error: "Error en la búsqueda" });
-  }
-});
-
-// 4. Iniciar servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
 });
